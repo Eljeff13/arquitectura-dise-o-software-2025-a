@@ -1,7 +1,9 @@
---structured file with good architectural practices 1.1.
+--Structured file with good architectural practices 1.1.
+-- Database for ecommerce cart system
 CREATE DATABASE IF NOT EXISTS ecommerce_cart;
 USE ecommerce_cart;
 
+-- Product categories
 CREATE TABLE categories (
     category_id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
@@ -11,6 +13,7 @@ CREATE TABLE categories (
     deleted_at TIMESTAMP NULL DEFAULT NULL
 );
 
+-- Products table
 CREATE TABLE products (
     product_id INT PRIMARY KEY AUTO_INCREMENT,
     category_id INT NOT NULL,
@@ -25,6 +28,7 @@ CREATE TABLE products (
     FOREIGN KEY (category_id) REFERENCES categories(category_id)
 );
 
+-- People info
 CREATE TABLE people (
     person_id INT PRIMARY KEY AUTO_INCREMENT,
     first_name VARCHAR(100) NOT NULL,
@@ -37,6 +41,7 @@ CREATE TABLE people (
     deleted_at TIMESTAMP NULL DEFAULT NULL
 );
 
+-- Users table
 CREATE TABLE users (
     user_id INT PRIMARY KEY AUTO_INCREMENT,
     person_id INT NOT NULL,
@@ -49,6 +54,7 @@ CREATE TABLE users (
     FOREIGN KEY (person_id) REFERENCES people(person_id)
 );
 
+-- Roles for users
 CREATE TABLE roles (
     role_id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(50) NOT NULL UNIQUE,
@@ -57,6 +63,7 @@ CREATE TABLE roles (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+-- User-role assignments
 CREATE TABLE user_roles (
     user_id INT NOT NULL,
     role_id INT NOT NULL,
@@ -66,11 +73,13 @@ CREATE TABLE user_roles (
     FOREIGN KEY(role_id) REFERENCES roles(role_id)
 );
 
+-- User types
 CREATE TABLE user_types (
     user_type_id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(30) NOT NULL UNIQUE
 );
 
+-- Assignment of user types
 CREATE TABLE user_type_assignments (
     user_id INT PRIMARY KEY,
     user_type_id INT NOT NULL,
@@ -79,23 +88,27 @@ CREATE TABLE user_type_assignments (
     FOREIGN KEY(user_type_id) REFERENCES user_types(user_type_id)
 );
 
+-- Employee extra info
 CREATE TABLE employees_extra (
     user_id INT PRIMARY KEY,
     position VARCHAR(100),
     FOREIGN KEY(user_id) REFERENCES users(user_id)
 );
 
+-- Supplier extra info
 CREATE TABLE suppliers_extra (
     user_id INT PRIMARY KEY,
     company_name VARCHAR(100),
     FOREIGN KEY(user_id) REFERENCES users(user_id)
 );
 
+-- Invoice status catalog
 CREATE TABLE invoice_status (
     status_id INT PRIMARY KEY AUTO_INCREMENT,
     status_name VARCHAR(20) NOT NULL UNIQUE
 );
 
+-- Invoices
 CREATE TABLE invoices (
     invoice_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
@@ -109,6 +122,7 @@ CREATE TABLE invoices (
     FOREIGN KEY (status_id) REFERENCES invoice_status(status_id)
 );
 
+-- Invoice details
 CREATE TABLE invoice_details (
     invoice_detail_id INT PRIMARY KEY AUTO_INCREMENT,
     invoice_id INT NOT NULL,
@@ -121,6 +135,7 @@ CREATE TABLE invoice_details (
     FOREIGN KEY (product_id) REFERENCES products(product_id)
 );
 
+-- Product price history
 CREATE TABLE product_price_history (
     price_history_id INT PRIMARY KEY AUTO_INCREMENT,
     product_id INT NOT NULL,
@@ -130,6 +145,7 @@ CREATE TABLE product_price_history (
     FOREIGN KEY (product_id) REFERENCES products(product_id)
 );
 
+-- Product stock movements
 CREATE TABLE product_stock_movements (
     stock_movement_id INT PRIMARY KEY AUTO_INCREMENT,
     product_id INT NOT NULL,
@@ -140,6 +156,7 @@ CREATE TABLE product_stock_movements (
     FOREIGN KEY (product_id) REFERENCES products(product_id)
 );
 
+-- Audit log
 CREATE TABLE audit_log (
     audit_id INT PRIMARY KEY AUTO_INCREMENT,
     table_name VARCHAR(50) NOT NULL,
@@ -151,6 +168,7 @@ CREATE TABLE audit_log (
     FOREIGN KEY (performed_by) REFERENCES users(user_id)
 );
 
+-- Indexes for optimization
 CREATE INDEX idx_products_category_id ON products(category_id);
 CREATE INDEX idx_people_email ON people(email);
 CREATE INDEX idx_users_username ON users(username);
