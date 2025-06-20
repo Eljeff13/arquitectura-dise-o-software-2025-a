@@ -1,0 +1,161 @@
+@startuml
+' Estilos básicos
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor White
+    ArrowColor Black
+    BorderColor Black
+}
+
+' Entidades principales
+class Category {
+    +category_id: int
+    +name: varchar
+    +description: text
+    +created_at: timestamp
+    +updated_at: timestamp
+    +deleted_at: timestamp
+}
+
+class Product {
+    +product_id: int
+    +category_id: int
+    +name: varchar
+    +description: text
+    +price: decimal
+    +stock: int
+    +image_url: varchar
+    +created_at: timestamp
+    +updated_at: timestamp
+    +deleted_at: timestamp
+}
+
+class Person {
+    +person_id: int
+    +first_name: varchar
+    +last_name: varchar
+    +email: varchar
+    +phone: varchar
+    +address: text
+    +created_at: timestamp
+    +updated_at: timestamp
+    +deleted_at: timestamp
+}
+
+class User {
+    +user_id: int
+    +person_id: int
+    +username: varchar
+    +password: varchar
+    +created_at: timestamp
+    +updated_at: timestamp
+    +last_login: timestamp
+    +deleted_at: timestamp
+}
+
+class Role {
+    +role_id: int
+    +name: varchar
+    +description: text
+    +created_at: timestamp
+    +updated_at: timestamp
+}
+
+class UserRole {
+    +user_id: int
+    +role_id: int
+    +assigned_at: timestamp
+}
+
+class UserType {
+    +user_type_id: int
+    +name: varchar
+}
+
+class UserTypeAssignment {
+    +user_id: int
+    +user_type_id: int
+    +created_at: timestamp
+}
+
+class EmployeesExtra {
+    +user_id: int
+    +position: varchar
+}
+
+class SuppliersExtra {
+    +user_id: int
+    +company_name: varchar
+}
+
+class InvoiceStatus {
+    +status_id: int
+    +status_name: varchar
+}
+
+class Invoice {
+    +invoice_id: int
+    +user_id: int
+    +invoice_date: timestamp
+    +total: decimal
+    +status_id: int
+    +created_at: timestamp
+    +updated_at: timestamp
+    +deleted_at: timestamp
+}
+
+class InvoiceDetail {
+    +invoice_detail_id: int
+    +invoice_id: int
+    +product_id: int
+    +quantity: int
+    +unit_price: decimal
+    +subtotal: decimal
+    +created_at: timestamp
+}
+
+class ProductPriceHistory {
+    +price_history_id: int
+    +product_id: int
+    +old_price: decimal
+    +new_price: decimal
+    +changed_at: timestamp
+}
+
+class ProductStockMovement {
+    +stock_movement_id: int
+    +product_id: int
+    +change: int
+    +reason: varchar
+    +reference_id: int
+    +created_at: timestamp
+}
+
+class AuditLog {
+    +audit_id: int
+    +table_name: varchar
+    +record_id: int
+    +action: varchar
+    +performed_by: int
+    +performed_at: timestamp
+    +details: json
+}
+
+' Relaciones principales
+Category "1" -- "0..*" Product : contiene >
+Product "1" -- "0..*" ProductPriceHistory : tiene >
+Product "1" -- "0..*" ProductStockMovement : movimiento >
+Person "1" -- "0..*" User : es >
+User "1" -- "0..*" Invoice : genera >
+User "1" -- "0..*" UserRole : tiene >
+UserRole "1" -- "1" Role : asigna >
+User "1" -- "0..1" UserTypeAssignment : tipo >
+UserTypeAssignment "1" -- "1" UserType : >
+User "1" -- "0..1" EmployeesExtra : empleado >
+User "1" -- "0..1" SuppliersExtra : proveedor >
+InvoiceStatus "1" -- "0..*" Invoice : estado >
+Invoice "1" -- "1..*" InvoiceDetail : detalle >
+Product "1" -- "0..*" InvoiceDetail : incluido >
+User "1" -- "0..*" AuditLog : audita >
+
+@enduml
