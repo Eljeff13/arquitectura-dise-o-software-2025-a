@@ -1,0 +1,156 @@
+@startuml Sequence Diagram - E-commerce Cart System
+
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 10
+
+title E-commerce Cart System - Order Processing Sequence
+
+actor Customer as CUSTOMER
+participant "Web App" as WEB
+participant "API Gateway" as GATEWAY
+participant "Order Service" as ORDER_SVC
+participant "Product Service" as PRODUCT_SVC
+participant "Payment Service" as PAYMENT_SVC
+participant "Inventory Service" as INVENTORY_SVC
+participant "Notification Service" as NOTIFICATION_SVC
+participant "Order Repository" as ORDER_REPO
+participant "Product Repository" as PRODUCT_REPO
+participant "Payment Gateway" as EXT_PAYMENT
+database "Database" as DB
+
+== Customer Authentication ==
+CUSTOMER -> WEB: Login with credentials
+WEB -> GATEWAY: POST /api/auth/login
+GATEWAY -> ORDER_SVC: Authenticate user
+ORDER_SVC -> DB: Validate credentials
+DB --> ORDER_SVC: User data
+ORDER_SVC --> GATEWAY: JWT token
+GATEWAY --> WEB: Authentication response
+WEB --> CUSTOMER: Login successful
+
+== Product Browsing ==
+CUSTOMER -> WEB: Browse products
+WEB -> GATEWAY: GET /api/products
+GATEWAY -> PRODUCT_SVC: Get product catalog
+PRODUCT_SVC -> PRODUCT_REPO: Find all active products
+PRODUCT_REPO -> DB: Query products
+DB --> PRODUCT_REPO: Product list
+PRODUCT_REPO --> PRODUCT_SVC: Product entities
+PRODUCT_SVC --> GATEWAY: Product DTOs
+GATEWAY --> WEB: Product data
+WEB --> CUSTOMER: Display products
+
+== Add to Cart ==
+CUSTOMER -> WEB: Add product to cart
+WEB -> GATEWAY: POST /api/cart/items
+GATEWAY -> ORDER_SVC: Add item to cart
+ORDER_SVC -> PRODUCT_SVC: Get product details
+PRODUCT_SVC -> PRODUCT_REPO: Find product by ID
+PRODUCT_REPO -> DB: Query product
+DB --> PRODUCT_REPO: Product data
+PRODUCT_REPO --> PRODUCT_SVC: Product entity
+PRODUCT_SVC --> ORDER_SVC: Product details
+ORDER_SVC -> ORDER_REPO: Add item to cart
+ORDER_REPO -> DB: Insert cart item
+DB --> ORDER_REPO: Success
+ORDER_REPO --> ORDER_SVC: Cart updated
+ORDER_SVC --> GATEWAY: Cart response
+GATEWAY --> WEB: Cart confirmation
+WEB --> CUSTOMER: Item added to cart
+
+== Checkout Process ==
+CUSTOMER -> WEB: Proceed to checkout
+WEB -> GATEWAY: GET /api/cart
+GATEWAY -> ORDER_SVC: Get cart details
+ORDER_SVC -> ORDER_REPO: Find customer cart
+ORDER_REPO -> DB: Query cart
+DB --> ORDER_REPO: Cart data
+ORDER_REPO --> ORDER_SVC: Cart entity
+ORDER_SVC --> GATEWAY: Cart details
+GATEWAY --> WEB: Cart information
+WEB --> CUSTOMER: Checkout form
+
+CUSTOMER -> WEB: Submit order
+WEB -> GATEWAY: POST /api/orders
+GATEWAY -> ORDER_SVC: Create order
+
+== Order Creation ==
+ORDER_SVC -> PRODUCT_SVC: Validate product availability
+PRODUCT_SVC -> PRODUCT_REPO: Check stock levels
+PRODUCT_REPO -> DB: Query inventory
+DB --> PRODUCT_REPO: Stock data
+PRODUCT_REPO --> PRODUCT_SVC: Stock information
+PRODUCT_SVC --> ORDER_SVC: Availability confirmed
+
+ORDER_SVC -> INVENTORY_SVC: Reserve inventory
+INVENTORY_SVC -> DB: Update stock levels
+DB --> INVENTORY_SVC: Stock updated
+INVENTORY_SVC --> ORDER_SVC: Inventory reserved
+
+ORDER_SVC -> ORDER_REPO: Create order
+ORDER_REPO -> DB: Insert order
+DB --> ORDER_REPO: Order created
+ORDER_REPO --> ORDER_SVC: Order entity
+
+== Payment Processing ==
+ORDER_SVC -> PAYMENT_SVC: Process payment
+PAYMENT_SVC -> EXT_PAYMENT: Charge customer
+EXT_PAYMENT --> PAYMENT_SVC: Payment result
+PAYMENT_SVC -> DB: Record payment
+DB --> PAYMENT_SVC: Payment saved
+PAYMENT_SVC --> ORDER_SVC: Payment completed
+
+ORDER_SVC -> ORDER_REPO: Update order status
+ORDER_REPO -> DB: Update order
+DB --> ORDER_REPO: Order updated
+ORDER_REPO --> ORDER_SVC: Order confirmed
+
+== Notification ==
+ORDER_SVC -> NOTIFICATION_SVC: Send order confirmation
+NOTIFICATION_SVC -> DB: Log notification
+DB --> NOTIFICATION_SVC: Notification logged
+NOTIFICATION_SVC --> ORDER_SVC: Notification sent
+
+ORDER_SVC --> GATEWAY: Order confirmation
+GATEWAY --> WEB: Order response
+WEB --> CUSTOMER: Order confirmed
+
+== Order Tracking ==
+CUSTOMER -> WEB: View order status
+WEB -> GATEWAY: GET /api/orders/{id}
+GATEWAY -> ORDER_SVC: Get order details
+ORDER_SVC -> ORDER_REPO: Find order by ID
+ORDER_REPO -> DB: Query order
+DB --> ORDER_REPO: Order data
+ORDER_REPO --> ORDER_SVC: Order entity
+ORDER_SVC --> GATEWAY: Order details
+GATEWAY --> WEB: Order information
+WEB --> CUSTOMER: Order status
+
+note right of ORDER_SVC
+  Order Service orchestrates:
+  - Inventory validation
+  - Payment processing
+  - Order creation
+  - Notification sending
+end note
+
+note right of PAYMENT_SVC
+  Payment Service handles:
+  - Payment method validation
+  - External gateway integration
+  - Transaction recording
+  - Payment status management
+end note
+
+note right of INVENTORY_SVC
+  Inventory Service manages:
+  - Stock level tracking
+  - Inventory reservation
+  - Stock updates
+  - Low stock alerts
+end note
+
+@enduml 

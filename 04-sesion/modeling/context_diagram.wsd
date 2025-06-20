@@ -1,0 +1,63 @@
+@startuml Context Diagram - E-commerce Cart System
+
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 10
+
+title E-commerce Cart System - Context Diagram
+
+' External actors
+actor "Customer" as CUSTOMER #87CEEB
+actor "Store Manager" as MANAGER #98FB98
+actor "System Administrator" as ADMIN #FFB6C1
+actor "Payment Gateway" as PAYMENT #FFD700
+actor "Shipping Provider" as SHIPPING #DDA0DD
+actor "Email Service" as EMAIL #F0E68C
+
+' System boundary
+rectangle "E-commerce Cart System" as SYSTEM {
+    rectangle "Web Application" as WEB #E6F3FF
+    rectangle "API Gateway" as API #E6F3FF
+    rectangle "Core Services" as SERVICES #E6F3FF
+    rectangle "Database" as DB #E6F3FF
+}
+
+' Customer interactions
+CUSTOMER --> WEB : Browse products
+CUSTOMER --> WEB : Manage shopping cart
+CUSTOMER --> WEB : Complete checkout
+CUSTOMER --> WEB : Track orders
+CUSTOMER --> WEB : Manage account
+
+' Manager interactions
+MANAGER --> WEB : Manage product catalog
+MANAGER --> WEB : Process orders
+MANAGER --> WEB : View reports
+MANAGER --> WEB : Manage inventory
+
+' Admin interactions
+ADMIN --> WEB : Manage users
+ADMIN --> WEB : Configure system
+ADMIN --> WEB : Monitor performance
+ADMIN --> WEB : Manage security
+
+' External service integrations
+PAYMENT <--> API : Process payments
+SHIPPING <--> API : Calculate shipping
+SHIPPING <--> API : Track deliveries
+EMAIL <--> API : Send notifications
+
+' Internal system relationships
+WEB --> API : HTTP requests
+API --> SERVICES : Internal calls
+SERVICES --> DB : Data persistence
+
+note right of SYSTEM
+  The E-commerce Cart System serves
+  multiple user types and integrates
+  with external services to provide
+  a complete online shopping experience.
+end note
+
+@enduml 

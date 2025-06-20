@@ -1,0 +1,132 @@
+@startuml Component Diagram - E-commerce Cart System
+
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 10
+
+title E-commerce Cart System - Component Diagram
+
+package "Frontend Layer" {
+    [React Web App] as WEB_APP #E6F3FF
+    [Mobile App] as MOBILE_APP #E6F3FF
+}
+
+package "API Gateway" {
+    [API Gateway] as GATEWAY #FFE6CC
+    [Authentication] as AUTH #FFE6CC
+    [Rate Limiting] as RATE_LIMIT #FFE6CC
+    [Request Routing] as ROUTING #FFE6CC
+}
+
+package "Application Services" {
+    [Product Service] as PRODUCT_SVC #D4EDDA
+    [User Service] as USER_SVC #D4EDDA
+    [Order Service] as ORDER_SVC #D4EDDA
+    [Payment Service] as PAYMENT_SVC #D4EDDA
+    [Notification Service] as NOTIFICATION_SVC #D4EDDA
+    [Inventory Service] as INVENTORY_SVC #D4EDDA
+}
+
+package "Domain Layer" {
+    [Product Domain] as PRODUCT_DOMAIN #F8D7DA
+    [User Domain] as USER_DOMAIN #F8D7DA
+    [Order Domain] as ORDER_DOMAIN #F8D7DA
+    [Payment Domain] as PAYMENT_DOMAIN #F8D7DA
+}
+
+package "Infrastructure Layer" {
+    [Product Repository] as PRODUCT_REPO #E2E3E5
+    [User Repository] as USER_REPO #E2E3E5
+    [Order Repository] as ORDER_REPO #E2E3E5
+    [Payment Repository] as PAYMENT_REPO #E2E3E5
+    [Email Service] as EMAIL_SVC #E2E3E5
+    [File Storage] as FILE_STORAGE #E2E3E5
+}
+
+package "External Services" {
+    [Payment Gateway] as EXT_PAYMENT #FFF3CD
+    [Shipping Provider] as EXT_SHIPPING #FFF3CD
+    [Email Provider] as EXT_EMAIL #FFF3CD
+}
+
+database "PostgreSQL Database" as DB #D1ECF1
+database "Redis Cache" as CACHE #D1ECF1
+
+' Frontend connections
+WEB_APP --> GATEWAY : HTTP/HTTPS
+MOBILE_APP --> GATEWAY : HTTP/HTTPS
+
+' API Gateway internal components
+GATEWAY --> AUTH : Authenticate requests
+GATEWAY --> RATE_LIMIT : Apply rate limits
+GATEWAY --> ROUTING : Route to services
+
+' Service layer connections
+ROUTING --> PRODUCT_SVC : Product requests
+ROUTING --> USER_SVC : User requests
+ROUTING --> ORDER_SVC : Order requests
+ROUTING --> PAYMENT_SVC : Payment requests
+ROUTING --> NOTIFICATION_SVC : Notification requests
+ROUTING --> INVENTORY_SVC : Inventory requests
+
+' Service to domain connections
+PRODUCT_SVC --> PRODUCT_DOMAIN : Business logic
+USER_SVC --> USER_DOMAIN : Business logic
+ORDER_SVC --> ORDER_DOMAIN : Business logic
+PAYMENT_SVC --> PAYMENT_DOMAIN : Business logic
+
+' Service to infrastructure connections
+PRODUCT_SVC --> PRODUCT_REPO : Data access
+USER_SVC --> USER_REPO : Data access
+ORDER_SVC --> ORDER_REPO : Data access
+PAYMENT_SVC --> PAYMENT_REPO : Data access
+NOTIFICATION_SVC --> EMAIL_SVC : Send emails
+PRODUCT_SVC --> FILE_STORAGE : Store images
+
+' External service connections
+PAYMENT_SVC --> EXT_PAYMENT : Process payments
+ORDER_SVC --> EXT_SHIPPING : Calculate shipping
+EMAIL_SVC --> EXT_EMAIL : Send emails
+
+' Database connections
+PRODUCT_REPO --> DB : Persist data
+USER_REPO --> DB : Persist data
+ORDER_REPO --> DB : Persist data
+PAYMENT_REPO --> DB : Persist data
+
+' Cache connections
+PRODUCT_SVC --> CACHE : Cache products
+USER_SVC --> CACHE : Cache sessions
+ORDER_SVC --> CACHE : Cache orders
+
+' Cross-service communication
+ORDER_SVC --> INVENTORY_SVC : Update inventory
+ORDER_SVC --> NOTIFICATION_SVC : Send confirmations
+PAYMENT_SVC --> NOTIFICATION_SVC : Send receipts
+
+note right of GATEWAY
+  API Gateway handles:
+  - Authentication & Authorization
+  - Rate limiting
+  - Request routing
+  - Load balancing
+end note
+
+note right of PRODUCT_SVC
+  Product Service manages:
+  - Product catalog
+  - Search & filtering
+  - Product reviews
+  - Category management
+end note
+
+note right of ORDER_SVC
+  Order Service handles:
+  - Shopping cart
+  - Order processing
+  - Order tracking
+  - Fulfillment
+end note
+
+@enduml 

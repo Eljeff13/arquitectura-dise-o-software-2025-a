@@ -1,0 +1,341 @@
+@startuml Domain Model - E-commerce Cart System
+
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 10
+
+title E-commerce Cart System - Domain Model
+
+package "Product Domain" {
+    class Product {
+        -id: ProductId
+        -name: ProductName
+        -description: ProductDescription
+        -price: Money
+        -stockQuantity: StockQuantity
+        -imageUrl: ImageUrl
+        -category: Category
+        -isActive: boolean
+        -createdAt: Date
+        -updatedAt: Date
+        --
+        +updatePrice(price: Money): void
+        +updateStock(quantity: StockQuantity): void
+        +reserveStock(quantity: StockQuantity): void
+        +isAvailable(): boolean
+    }
+    
+    class Category {
+        -id: CategoryId
+        -name: CategoryName
+        -description: CategoryDescription
+        -isActive: boolean
+        -createdAt: Date
+        -updatedAt: Date
+        --
+        +activate(): void
+        +deactivate(): void
+    }
+    
+    class ProductId {
+        -value: string
+        --
+        +generate(): ProductId
+        +equals(other: ProductId): boolean
+    }
+    
+    class Money {
+        -amount: number
+        -currency: Currency
+        --
+        +add(other: Money): Money
+        +subtract(other: Money): Money
+        +multiply(factor: number): Money
+        +isNegative(): boolean
+        +static zero(): Money
+    }
+    
+    class StockQuantity {
+        -value: number
+        --
+        +add(quantity: StockQuantity): StockQuantity
+        +subtract(quantity: StockQuantity): StockQuantity
+        +isGreaterThan(other: StockQuantity): boolean
+        +isLessThan(other: StockQuantity): boolean
+        +static zero(): StockQuantity
+    }
+}
+
+package "User Domain" {
+    class User {
+        -id: UserId
+        -username: Username
+        -passwordHash: PasswordHash
+        -isActive: boolean
+        -lastLoginAt: Date
+        -person: Person
+        -roles: Role[]
+        -createdAt: Date
+        -updatedAt: Date
+        --
+        +authenticate(password: string): boolean
+        +addRole(role: Role): void
+        +removeRole(role: Role): void
+        +hasPermission(permission: string): boolean
+        +updateLastLogin(): void
+    }
+    
+    class Person {
+        -id: PersonId
+        -firstName: PersonName
+        -lastName: PersonName
+        -email: Email
+        -phone: PhoneNumber
+        -address: Address
+        -createdAt: Date
+        -updatedAt: Date
+        --
+        +updateContactInfo(email: Email, phone: PhoneNumber): void
+        +updateAddress(address: Address): void
+        +getFullName(): string
+    }
+    
+    class Role {
+        -id: RoleId
+        -name: RoleName
+        -description: RoleDescription
+        -permissions: Permission[]
+        -isActive: boolean
+        -createdAt: Date
+        -updatedAt: Date
+        --
+        +addPermission(permission: Permission): void
+        +removePermission(permission: Permission): void
+        +hasPermission(permission: string): boolean
+    }
+    
+    class Email {
+        -value: string
+        --
+        +getDomain(): string
+        +isValid(): boolean
+    }
+}
+
+package "Order Domain" {
+    class Order {
+        -id: OrderId
+        -orderNumber: OrderNumber
+        -customer: Customer
+        -items: OrderItem[]
+        -totalAmount: Money
+        -status: OrderStatus
+        -shippingAddress: Address
+        -billingAddress: Address
+        -createdAt: Date
+        -updatedAt: Date
+        --
+        +addItem(product: Product, quantity: Quantity): void
+        +removeItem(itemId: OrderItemId): void
+        +updateItemQuantity(itemId: OrderItemId, quantity: Quantity): void
+        +confirm(): void
+        +process(): void
+        +ship(): void
+        +deliver(): void
+        +cancel(): void
+        +calculateTotal(): Money
+    }
+    
+    class OrderItem {
+        -id: OrderItemId
+        -product: Product
+        -quantity: Quantity
+        -unitPrice: Money
+        -subtotal: Money
+        -createdAt: Date
+        --
+        +updateQuantity(quantity: Quantity): void
+        +calculateSubtotal(): Money
+    }
+    
+    class ShoppingCart {
+        -id: CartId
+        -customer: Customer
+        -items: CartItem[]
+        -createdAt: Date
+        -updatedAt: Date
+        --
+        +addItem(product: Product, quantity: Quantity): void
+        +removeItem(itemId: CartItemId): void
+        +updateItemQuantity(itemId: CartItemId, quantity: Quantity): void
+        +clear(): void
+        +getTotal(): Money
+        +convertToOrder(): Order
+    }
+    
+    class CartItem {
+        -id: CartItemId
+        -product: Product
+        -quantity: Quantity
+        -addedAt: Date
+        -updatedAt: Date
+        --
+        +updateQuantity(quantity: Quantity): void
+    }
+    
+    enum OrderStatus {
+        PENDING
+        CONFIRMED
+        PROCESSING
+        SHIPPED
+        DELIVERED
+        CANCELLED
+    }
+}
+
+package "Payment Domain" {
+    class Payment {
+        -id: PaymentId
+        -order: Order
+        -amount: Money
+        -method: PaymentMethod
+        -status: PaymentStatus
+        -transactionId: TransactionId
+        -processedAt: Date
+        -createdAt: Date
+        -updatedAt: Date
+        --
+        +process(): void
+        +complete(transactionId: TransactionId): void
+        +fail(reason: string): void
+        +refund(): void
+    }
+    
+    class Invoice {
+        -id: InvoiceId
+        -order: Order
+        -invoiceNumber: InvoiceNumber
+        -amount: Money
+        -status: InvoiceStatus
+        -dueDate: Date
+        -createdAt: Date
+        -updatedAt: Date
+        --
+        +markAsPaid(): void
+        +markAsOverdue(): void
+        +cancel(): void
+    }
+    
+    enum PaymentMethod {
+        CREDIT_CARD
+        PAYPAL
+        BANK_TRANSFER
+        CASH
+    }
+    
+    enum PaymentStatus {
+        PENDING
+        PROCESSING
+        COMPLETED
+        FAILED
+        REFUNDED
+    }
+}
+
+package "Value Objects" {
+    class ProductName {
+        -value: string
+        --
+        +isValid(): boolean
+    }
+    
+    class ProductDescription {
+        -value: string
+        --
+        +getLength(): number
+    }
+    
+    class Username {
+        -value: string
+        --
+        +isValid(): boolean
+    }
+    
+    class PasswordHash {
+        -value: string
+        --
+        +verify(password: string): boolean
+    }
+    
+    class Address {
+        -street: string
+        -city: string
+        -state: string
+        -zipCode: string
+        -country: string
+        --
+        +isValid(): boolean
+        +getFullAddress(): string
+    }
+    
+    class Quantity {
+        -value: number
+        --
+        +add(quantity: Quantity): Quantity
+        +subtract(quantity: Quantity): Quantity
+        +isPositive(): boolean
+    }
+}
+
+' Relationships
+Product ||--o{ OrderItem : "contains"
+Category ||--o{ Product : "categorizes"
+User ||--|| Person : "has"
+User ||--o{ Role : "has"
+Order ||--o{ OrderItem : "contains"
+Order ||--|| Customer : "belongs to"
+ShoppingCart ||--o{ CartItem : "contains"
+ShoppingCart ||--|| Customer : "belongs to"
+Payment ||--|| Order : "pays for"
+Invoice ||--|| Order : "bills"
+
+' Value object relationships
+Product ||--|| ProductName : "has"
+Product ||--|| ProductDescription : "has"
+Product ||--|| Money : "has"
+Product ||--|| StockQuantity : "has"
+Product ||--|| ProductId : "identified by"
+User ||--|| Username : "has"
+User ||--|| PasswordHash : "has"
+Person ||--|| Email : "has"
+Person ||--|| Address : "has"
+Order ||--|| OrderStatus : "has"
+Payment ||--|| PaymentMethod : "uses"
+Payment ||--|| PaymentStatus : "has"
+
+note right of Product
+  Product aggregates:
+  - Product information
+  - Inventory management
+  - Pricing logic
+  - Availability status
+end note
+
+note right of Order
+  Order aggregates:
+  - Order items
+  - Customer information
+  - Order status
+  - Payment information
+end note
+
+note right of User
+  User aggregates:
+  - Authentication details
+  - Personal information
+  - Role assignments
+  - Account status
+end note
+
+@enduml 

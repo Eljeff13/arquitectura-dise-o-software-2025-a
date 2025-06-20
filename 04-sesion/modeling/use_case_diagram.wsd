@@ -1,0 +1,230 @@
+@startuml Use Case Diagram - E-commerce Cart System
+
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 10
+
+title E-commerce Cart System - Use Case Diagram
+
+' Actors
+actor "Customer" as CUSTOMER #87CEEB
+actor "Store Manager" as MANAGER #98FB98
+actor "System Administrator" as ADMIN #FFB6C1
+actor "Payment Gateway" as PAYMENT #FFD700
+actor "Shipping Provider" as SHIPPING #DDA0DD
+actor "Email Service" as EMAIL #F0E68C
+
+' Customer Use Cases
+package "Customer Management" {
+    usecase "Register Account" as UC_REGISTER
+    usecase "Login" as UC_LOGIN
+    usecase "Manage Profile" as UC_PROFILE
+    usecase "Reset Password" as UC_RESET_PWD
+    usecase "View Order History" as UC_ORDER_HISTORY
+}
+
+package "Product Browsing" {
+    usecase "Browse Products" as UC_BROWSE
+    usecase "Search Products" as UC_SEARCH
+    usecase "Filter Products" as UC_FILTER
+    usecase "View Product Details" as UC_PRODUCT_DETAILS
+    usecase "View Product Reviews" as UC_REVIEWS
+}
+
+package "Shopping Cart" {
+    usecase "Add to Cart" as UC_ADD_CART
+    usecase "Remove from Cart" as UC_REMOVE_CART
+    usecase "Update Cart Quantity" as UC_UPDATE_CART
+    usecase "View Cart" as UC_VIEW_CART
+    usecase "Save Cart for Later" as UC_SAVE_CART
+}
+
+package "Order Management" {
+    usecase "Proceed to Checkout" as UC_CHECKOUT
+    usecase "Enter Shipping Address" as UC_SHIPPING
+    usecase "Select Payment Method" as UC_PAYMENT_METHOD
+    usecase "Place Order" as UC_PLACE_ORDER
+    usecase "Track Order" as UC_TRACK_ORDER
+    usecase "Cancel Order" as UC_CANCEL_ORDER
+    usecase "Request Refund" as UC_REFUND
+}
+
+package "Payment" {
+    usecase "Process Payment" as UC_PROCESS_PAYMENT
+    usecase "Validate Payment" as UC_VALIDATE_PAYMENT
+    usecase "Generate Invoice" as UC_GENERATE_INVOICE
+}
+
+' Manager Use Cases
+package "Product Management" {
+    usecase "Add Product" as UC_ADD_PRODUCT
+    usecase "Edit Product" as UC_EDIT_PRODUCT
+    usecase "Delete Product" as UC_DELETE_PRODUCT
+    usecase "Manage Categories" as UC_MANAGE_CATEGORIES
+    usecase "Upload Product Images" as UC_UPLOAD_IMAGES
+    usecase "Set Product Pricing" as UC_SET_PRICING
+}
+
+package "Inventory Management" {
+    usecase "Update Stock Levels" as UC_UPDATE_STOCK
+    usecase "View Inventory Report" as UC_INVENTORY_REPORT
+    usecase "Set Low Stock Alerts" as UC_STOCK_ALERTS
+    usecase "Process Returns" as UC_PROCESS_RETURNS
+}
+
+package "Order Processing" {
+    usecase "View Orders" as UC_VIEW_ORDERS
+    usecase "Process Orders" as UC_PROCESS_ORDERS
+    usecase "Update Order Status" as UC_UPDATE_ORDER_STATUS
+    usecase "Generate Shipping Labels" as UC_SHIPPING_LABELS
+    usecase "Handle Customer Inquiries" as UC_CUSTOMER_INQUIRIES
+}
+
+package "Reporting" {
+    usecase "View Sales Reports" as UC_SALES_REPORTS
+    usecase "View Customer Reports" as UC_CUSTOMER_REPORTS
+    usecase "View Inventory Reports" as UC_INV_REPORTS
+    usecase "Export Data" as UC_EXPORT_DATA
+}
+
+' Admin Use Cases
+package "User Management" {
+    usecase "Manage Users" as UC_MANAGE_USERS
+    usecase "Assign Roles" as UC_ASSIGN_ROLES
+    usecase "Manage Permissions" as UC_MANAGE_PERMISSIONS
+    usecase "View User Activity" as UC_USER_ACTIVITY
+}
+
+package "System Configuration" {
+    usecase "Configure System Settings" as UC_CONFIG_SYSTEM
+    usecase "Manage Payment Methods" as UC_MANAGE_PAYMENTS
+    usecase "Configure Shipping Options" as UC_CONFIG_SHIPPING
+    usecase "Set Tax Rates" as UC_SET_TAX
+}
+
+package "System Monitoring" {
+    usecase "Monitor System Performance" as UC_MONITOR_PERFORMANCE
+    usecase "View System Logs" as UC_VIEW_LOGS
+    usecase "Manage Backups" as UC_MANAGE_BACKUPS
+    usecase "Handle System Alerts" as UC_SYSTEM_ALERTS
+}
+
+' External Service Use Cases
+package "External Integrations" {
+    usecase "Process Payment" as UC_EXT_PAYMENT
+    usecase "Calculate Shipping" as UC_CALC_SHIPPING
+    usecase "Track Shipment" as UC_TRACK_SHIPMENT
+    usecase "Send Email Notifications" as UC_SEND_EMAILS
+}
+
+' Customer relationships
+CUSTOMER --> UC_REGISTER
+CUSTOMER --> UC_LOGIN
+CUSTOMER --> UC_PROFILE
+CUSTOMER --> UC_RESET_PWD
+CUSTOMER --> UC_ORDER_HISTORY
+CUSTOMER --> UC_BROWSE
+CUSTOMER --> UC_SEARCH
+CUSTOMER --> UC_FILTER
+CUSTOMER --> UC_PRODUCT_DETAILS
+CUSTOMER --> UC_REVIEWS
+CUSTOMER --> UC_ADD_CART
+CUSTOMER --> UC_REMOVE_CART
+CUSTOMER --> UC_UPDATE_CART
+CUSTOMER --> UC_VIEW_CART
+CUSTOMER --> UC_SAVE_CART
+CUSTOMER --> UC_CHECKOUT
+CUSTOMER --> UC_SHIPPING
+CUSTOMER --> UC_PAYMENT_METHOD
+CUSTOMER --> UC_PLACE_ORDER
+CUSTOMER --> UC_TRACK_ORDER
+CUSTOMER --> UC_CANCEL_ORDER
+CUSTOMER --> UC_REFUND
+
+' Manager relationships
+MANAGER --> UC_ADD_PRODUCT
+MANAGER --> UC_EDIT_PRODUCT
+MANAGER --> UC_DELETE_PRODUCT
+MANAGER --> UC_MANAGE_CATEGORIES
+MANAGER --> UC_UPLOAD_IMAGES
+MANAGER --> UC_SET_PRICING
+MANAGER --> UC_UPDATE_STOCK
+MANAGER --> UC_INVENTORY_REPORT
+MANAGER --> UC_STOCK_ALERTS
+MANAGER --> UC_PROCESS_RETURNS
+MANAGER --> UC_VIEW_ORDERS
+MANAGER --> UC_PROCESS_ORDERS
+MANAGER --> UC_UPDATE_ORDER_STATUS
+MANAGER --> UC_SHIPPING_LABELS
+MANAGER --> UC_CUSTOMER_INQUIRIES
+MANAGER --> UC_SALES_REPORTS
+MANAGER --> UC_CUSTOMER_REPORTS
+MANAGER --> UC_INV_REPORTS
+MANAGER --> UC_EXPORT_DATA
+
+' Admin relationships
+ADMIN --> UC_MANAGE_USERS
+ADMIN --> UC_ASSIGN_ROLES
+ADMIN --> UC_MANAGE_PERMISSIONS
+ADMIN --> UC_USER_ACTIVITY
+ADMIN --> UC_CONFIG_SYSTEM
+ADMIN --> UC_MANAGE_PAYMENTS
+ADMIN --> UC_CONFIG_SHIPPING
+ADMIN --> UC_SET_TAX
+ADMIN --> UC_MONITOR_PERFORMANCE
+ADMIN --> UC_VIEW_LOGS
+ADMIN --> UC_MANAGE_BACKUPS
+ADMIN --> UC_SYSTEM_ALERTS
+
+' External service relationships
+PAYMENT --> UC_EXT_PAYMENT
+SHIPPING --> UC_CALC_SHIPPING
+SHIPPING --> UC_TRACK_SHIPMENT
+EMAIL --> UC_SEND_EMAILS
+
+' Include relationships
+UC_PLACE_ORDER ..> UC_PROCESS_PAYMENT : <<include>>
+UC_PROCESS_PAYMENT ..> UC_VALIDATE_PAYMENT : <<include>>
+UC_PROCESS_PAYMENT ..> UC_GENERATE_INVOICE : <<include>>
+UC_CHECKOUT ..> UC_SHIPPING : <<include>>
+UC_CHECKOUT ..> UC_PAYMENT_METHOD : <<include>>
+UC_ADD_PRODUCT ..> UC_UPLOAD_IMAGES : <<include>>
+UC_ADD_PRODUCT ..> UC_SET_PRICING : <<include>>
+UC_PROCESS_ORDERS ..> UC_UPDATE_ORDER_STATUS : <<include>>
+UC_PROCESS_ORDERS ..> UC_SHIPPING_LABELS : <<include>>
+
+' Extend relationships
+UC_BROWSE ..> UC_FILTER : <<extend>>
+UC_BROWSE ..> UC_SEARCH : <<extend>>
+UC_PRODUCT_DETAILS ..> UC_REVIEWS : <<extend>>
+UC_VIEW_CART ..> UC_UPDATE_CART : <<extend>>
+UC_VIEW_CART ..> UC_REMOVE_CART : <<extend>>
+UC_TRACK_ORDER ..> UC_CANCEL_ORDER : <<extend>>
+UC_TRACK_ORDER ..> UC_REFUND : <<extend>>
+
+note right of CUSTOMER
+  Customer can:
+  - Browse and purchase products
+  - Manage their account
+  - Track orders
+  - Request support
+end note
+
+note right of MANAGER
+  Store Manager can:
+  - Manage product catalog
+  - Process orders
+  - Monitor inventory
+  - Generate reports
+end note
+
+note right of ADMIN
+  System Administrator can:
+  - Manage users and permissions
+  - Configure system settings
+  - Monitor system health
+  - Handle system maintenance
+end note
+
+@enduml 

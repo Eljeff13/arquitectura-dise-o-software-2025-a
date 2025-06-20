@@ -1,0 +1,193 @@
+@startuml Deployment Diagram - E-commerce Cart System
+
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 10
+
+title E-commerce Cart System - Deployment Diagram
+
+node "Cloud Infrastructure (AWS/Azure/GCP)" as CLOUD {
+    node "Load Balancer" as LB {
+        [Application Load Balancer] as ALB #FFE6CC
+    }
+    
+    node "Web Tier" as WEB_TIER {
+        node "Web Server 1" as WEB1 {
+            [React Web App] as WEB_APP1 #E6F3FF
+            [Nginx] as NGINX1 #E6F3FF
+        }
+        
+        node "Web Server 2" as WEB2 {
+            [React Web App] as WEB_APP2 #E6F3FF
+            [Nginx] as NGINX2 #E6F3FF
+        }
+    }
+    
+    node "API Tier" as API_TIER {
+        node "API Server 1" as API1 {
+            [API Gateway] as GATEWAY1 #FFE6CC
+            [Node.js Runtime] as NODE1 #FFE6CC
+        }
+        
+        node "API Server 2" as API2 {
+            [API Gateway] as GATEWAY2 #FFE6CC
+            [Node.js Runtime] as NODE2 #FFE6CC
+        }
+    }
+    
+    node "Application Tier" as APP_TIER {
+        node "App Server 1" as APP1 {
+            [Product Service] as PRODUCT_SVC1 #D4EDDA
+            [User Service] as USER_SVC1 #D4EDDA
+            [Order Service] as ORDER_SVC1 #D4EDDA
+            [Payment Service] as PAYMENT_SVC1 #D4EDDA
+            [Node.js Runtime] as NODE_APP1 #D4EDDA
+        }
+        
+        node "App Server 2" as APP2 {
+            [Product Service] as PRODUCT_SVC2 #D4EDDA
+            [User Service] as USER_SVC2 #D4EDDA
+            [Order Service] as ORDER_SVC2 #D4EDDA
+            [Payment Service] as PAYMENT_SVC2 #D4EDDA
+            [Node.js Runtime] as NODE_APP2 #D4EDDA
+        }
+    }
+    
+    node "Data Tier" as DATA_TIER {
+        node "Database Cluster" as DB_CLUSTER {
+            [PostgreSQL Primary] as DB_PRIMARY #D1ECF1
+            [PostgreSQL Replica 1] as DB_REPLICA1 #D1ECF1
+            [PostgreSQL Replica 2] as DB_REPLICA2 #D1ECF1
+        }
+        
+        node "Cache Cluster" as CACHE_CLUSTER {
+            [Redis Primary] as REDIS_PRIMARY #D1ECF1
+            [Redis Replica 1] as REDIS_REPLICA1 #D1ECF1
+            [Redis Replica 2] as REDIS_REPLICA2 #D1ECF1
+        }
+        
+        node "Storage" as STORAGE {
+            [Object Storage] as S3 #D1ECF1
+            [File Storage] as EFS #D1ECF1
+        }
+    }
+    
+    node "Monitoring Tier" as MONITORING_TIER {
+        [Prometheus] as PROMETHEUS #FFF3CD
+        [Grafana] as GRAFANA #FFF3CD
+        [ELK Stack] as ELK #FFF3CD
+        [Alert Manager] as ALERT_MANAGER #FFF3CD
+    }
+}
+
+node "External Services" as EXTERNAL {
+    [Payment Gateway] as EXT_PAYMENT #FFB6C1
+    [Shipping Provider] as EXT_SHIPPING #FFB6C1
+    [Email Service] as EXT_EMAIL #FFB6C1
+    [CDN] as CDN #FFB6C1
+}
+
+' Load balancer connections
+ALB --> NGINX1 : HTTP/HTTPS
+ALB --> NGINX2 : HTTP/HTTPS
+
+' Web tier connections
+NGINX1 --> WEB_APP1 : Serve static files
+NGINX2 --> WEB_APP2 : Serve static files
+WEB_APP1 --> GATEWAY1 : API calls
+WEB_APP2 --> GATEWAY2 : API calls
+
+' API tier connections
+GATEWAY1 --> PRODUCT_SVC1 : Route requests
+GATEWAY1 --> USER_SVC1 : Route requests
+GATEWAY1 --> ORDER_SVC1 : Route requests
+GATEWAY1 --> PAYMENT_SVC1 : Route requests
+
+GATEWAY2 --> PRODUCT_SVC2 : Route requests
+GATEWAY2 --> USER_SVC2 : Route requests
+GATEWAY2 --> ORDER_SVC2 : Route requests
+GATEWAY2 --> PAYMENT_SVC2 : Route requests
+
+' Application tier connections
+PRODUCT_SVC1 --> DB_PRIMARY : Read/Write
+PRODUCT_SVC1 --> DB_REPLICA1 : Read
+PRODUCT_SVC1 --> REDIS_PRIMARY : Cache
+
+USER_SVC1 --> DB_PRIMARY : Read/Write
+USER_SVC1 --> DB_REPLICA1 : Read
+USER_SVC1 --> REDIS_PRIMARY : Sessions
+
+ORDER_SVC1 --> DB_PRIMARY : Read/Write
+ORDER_SVC1 --> DB_REPLICA1 : Read
+ORDER_SVC1 --> REDIS_PRIMARY : Cache
+
+PAYMENT_SVC1 --> DB_PRIMARY : Read/Write
+PAYMENT_SVC1 --> DB_REPLICA1 : Read
+
+' Database replication
+DB_PRIMARY --> DB_REPLICA1 : Replicate
+DB_PRIMARY --> DB_REPLICA2 : Replicate
+
+' Redis replication
+REDIS_PRIMARY --> REDIS_REPLICA1 : Replicate
+REDIS_PRIMARY --> REDIS_REPLICA2 : Replicate
+
+' Storage connections
+PRODUCT_SVC1 --> S3 : Store images
+PRODUCT_SVC2 --> S3 : Store images
+WEB_APP1 --> EFS : Shared files
+WEB_APP2 --> EFS : Shared files
+
+' External service connections
+PAYMENT_SVC1 --> EXT_PAYMENT : Process payments
+PAYMENT_SVC2 --> EXT_PAYMENT : Process payments
+ORDER_SVC1 --> EXT_SHIPPING : Calculate shipping
+ORDER_SVC2 --> EXT_SHIPPING : Calculate shipping
+USER_SVC1 --> EXT_EMAIL : Send emails
+USER_SVC2 --> EXT_EMAIL : Send emails
+
+' CDN connections
+CDN --> S3 : Cache static content
+WEB_APP1 --> CDN : Load assets
+WEB_APP2 --> CDN : Load assets
+
+' Monitoring connections
+PROMETHEUS --> PRODUCT_SVC1 : Collect metrics
+PROMETHEUS --> USER_SVC1 : Collect metrics
+PROMETHEUS --> ORDER_SVC1 : Collect metrics
+PROMETHEUS --> PAYMENT_SVC1 : Collect metrics
+
+GRAFANA --> PROMETHEUS : Query metrics
+ELK --> PRODUCT_SVC1 : Collect logs
+ELK --> USER_SVC1 : Collect logs
+ELK --> ORDER_SVC1 : Collect logs
+ELK --> PAYMENT_SVC1 : Collect logs
+
+ALERT_MANAGER --> PROMETHEUS : Monitor alerts
+
+note right of CLOUD
+  Cloud Infrastructure provides:
+  - Auto-scaling capabilities
+  - High availability
+  - Disaster recovery
+  - Security and compliance
+end note
+
+note right of DB_CLUSTER
+  Database Cluster ensures:
+  - Data redundancy
+  - Read scalability
+  - Automatic failover
+  - Backup and recovery
+end note
+
+note right of MONITORING_TIER
+  Monitoring provides:
+  - Real-time metrics
+  - Log aggregation
+  - Performance monitoring
+  - Alert management
+end note
+
+@enduml 
